@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title><![CDATA[无插件上拉加载]]></title>
+    <url>%2F2019%2F03%2F27%2F%E6%97%A0%E6%8F%92%E4%BB%B6%E4%B8%8A%E6%8B%89%E5%8A%A0%E8%BD%BD%2F</url>
+    <content type="text"><![CDATA[在写这篇文档之前，自己也写过移动端的上拉加载，不过一直以来都是用插件。 这次有时间吧原理好好梳理下； ¶原理： 浏览器内容高度(随内容多少变化)： document.documentelement.scrollHeight(ie的scrollHeight为document.body.scrollHeight) 滚动条的高度： dooument.documentelement.scrollTop(ie的scrollTop为document.body.scrollTop) 设备网页的可见高度(很多人说是设备的高度，自己斟酌)： widnow.screen.height 所以，当document.documentelement.scrollHeight = dooument.documentelement.scrollTop + widnow.screen.height时，就是滑到底部，需要请求下一页数据的时候 下面是核心代码： 12345678910111213141516171819window.onscroll = function(event)&#123; var screenHeight = window.screen.height; var scrollHeight = document.documentElement.scrollHeight; var scrollTop = document.documentElement.scrollTop; // 下面的10是在滑动在距离底部10px的时候,触发下一页数据请求.可自行调节 if(scrollHeight - (screenHeight + scrollTop) &lt; 10)&#123; //下面就是请求下一页数据的逻辑了，自行发挥 var htmlt = ''; for(var i = 0; i &lt; arr.length; i++)&#123; htmlt = htmlt + '&lt;p&gt;' + arr[i] + '&lt;/p&gt;'; &#125; var box = $('.box').html() $('.box').html(box + htmlt); &#125;&#125; 好用的话记得star呀~~😛 [上拉滚动 demo git地址]https://github.com/yagmdream/scroll]]></content>
+      <tags>
+        <tag>javascript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[github+hexo搭建博客基础教程]]></title>
+    <url>%2F2019%2F03%2F21%2F%E5%85%A5%E9%97%A8%E7%BA%A7github-hexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E6%95%99%E7%A8%8B%2F</url>
+    <content type="text"><![CDATA[¶准备：1.安装node.js环境并配置好 配置好之后，window + R 打开运行窗口，输入如下命令。出现版本号则说明安装成功 ¶2.github注册并新建一个仓库，仓库名必须和用户名相同，格式遵守：用户名.github.io 点击确定，仓库就建好了。 ¶3.在仓库上面最右边的菜单点击setting 然后向下拉到Github Pages,圈出的地方会有个网址（ps: 我这个是做了自定义域名），打开那个网址。你会发现项目在网络上可以打开了 ¶4.下来我们开始搭建安装Hexo 新建一个文件夹，进入文件夹，右键点击Git Bash Here打开命令行工具 输入命令, 开始全局安装hexo 1npm install hexo -g 安装完成之后输入 1hexo -v 出现下图，则安装成功 ¶5.输入hexo init进行项目初始化 出现下图 ，则说明项目初始化成功 ¶6.然后输入npm install安装所需的组件 1npm install ¶7.安装完成，就可以查看我们本地的博客了，输入： 1hexo s 打开圈出的地址：就能查看我们的博客雏形了😄 打开后正常应该是下面酱紫滴😝 ¶下来我们将博客放在我们github网址能访问的地方 ¶添加ssh(ps:这个是为了我们方便的将文章发布上去)，如果之前有添加过ssh，则略过 进入ssh文件夹1cs ~/.ssh ¶输入ls 查看是否有id_rsa，id_rsa.pub 这两个文件夹 1ls ¶如果没有，就输入下面的命令，然后回车。过程中会要求你输入github的账号和密码。 1ssh-keygen -t rsa -C &quot;你的github邮箱&quot; ¶输入完成之后。查看你的 C:\Users\hasee.ssh (ps:我的是这个) 大部分人应该是这个 C:\Users\window.ssh 文件件下面找到id_rsa.pub文件。 打开并复制里面的全部内容。然后登陆你的github,点击头像,选择settings ¶选择左侧边栏的SSH and GPG keys,点击New SSH keys ¶添加完成之后，输入下面的命令。看看是否添加成功 1ssh -T git@github.com ¶出现下面的提示，说明已经添加成功 ¶部署设置，在项目的根目录下找到_config.yml 文件，打开，拉到最下面，修改repository为你github博客的ssh 1234deploy: type: git repository: git@github.com:yagmdream/yagmdream.github.io.git branch: master ¶现在可以准备部署文章了，安装部署插件 1npm install hexo-deployer-git --save ¶安装完成之后，输入hexo d -g 生成及部署文章 1hexo d -g 现在可以线上访问： 用户名.github.io的地址 查看博客了😄]]></content>
+      <tags>
+        <tag>分享</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[mint-ui的cdn使用]]></title>
+    <url>%2F2019%2F03%2F20%2Fmint-ui%E7%9A%84cdn%E4%BD%BF%E7%94%A8%2F</url>
+    <content type="text"><![CDATA[mint-ui平时使用多的经常是在类似 vue-cli 搭建好的框架中用import 引入，那如果我们cdn直接引入 script 。那里面的消息框该怎么用呢？ 12&lt;link rel="stylesheet" href="/Public/app_car_sales/css_v1_1/mint.ui.css"&gt;&lt;script src="/Public/app_car_sales/js_v1_1/mint.ui.js"&gt;&lt;/script&gt; toast、message调用看下面： 12345678//在 new Vue 对象的方法中直接调用就可以了this.$toast('这是一个提示窗');//message同理（全拼全部小写）this.$messagebox(&#123; title: '提示', message: '这是一个有确定按钮的弹窗', &#125;);]]></content>
+      <tags>
+        <tag>mint-ui</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[react-super理解]]></title>
+    <url>%2F2019%2F03%2F20%2Freact-super%E7%90%86%E8%A7%A3%2F</url>
+    <content type="text"><![CDATA[最近在看react的文档，发现react的逻辑都是以component为基础的。 比如： 123456class Clock extends React.Component &#123; constructor(props)&#123; super(props); console.log(this); &#125; &#125; 在es6中class的继承是通过extends关键字实现的。constructor 是类默认的构造方法。那么super是做什么用的？ ¶1.有super() or 无super() 我们现在注释掉super(props) 123456class Clock extends React.Component &#123; constructor(props)&#123; //super(props); console.log(this); &#125; &#125; 提示this不存在，就是说super是子类为了继承父类的this。 子类是没有自己的this的，它只能继承父类的this对象，然后对其操作。而super就是将父类的this继承给子类的。没有super，子类是无法拿到this对象的。 所以我们这样写 super() 123456class Clock extends React.Component &#123; constructor(props)&#123; super(); console.log(this); &#125; &#125; 打印出this为： ¶2.super(props) or super() 现在我们打印下 this.props 123456class Clock extends React.Component &#123; constructor(props)&#123; super(props); console.log(this.props); &#125; &#125; 现在是可以正常打印出结果的，现在将super中的props删掉 123456class Clock extends React.Component &#123; constructor(props)&#123; super(); console.log(this.props); &#125; &#125; 也就是说，如果我们想在constructor中使用props，super中就必须要带参数。否则是无法拿到值的。 所以还是建议，不论constructor中是否用到props ， 都这样写super(props); 这样不论什么情况都不会有拿不到值或者报错的情况 先写到这吧，要是有别的认知再来补充😝😝~~~]]></content>
+      <tags>
+        <tag>react</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[react初识]]></title>
+    <url>%2F2019%2F02%2F20%2Freact%E5%88%9D%E8%AF%86%2F</url>
+    <content type="text"><![CDATA[新年伊始，领导说后面相面考虑用react开发，最近看了react的文档。真心话，觉得好复杂。个人想法ps: 也可能是因为之前用的vue，一时半会转不过来的原因 。希望不会有人打我😂 ¶话不多说 我们先来感受下 注意：react对node版本有要求: 1Node &gt;= 6 and npm &gt;= 5.2 首先先全局安装create-react-app这个脚手架， 为了后续执行命令用： 1npm install -g create-react-app 然后开始创建我们的第一个react项目 1create-react-app myapp //myapp是项目名 创建完成之后： 12cd myapp //进入项目yarn start //运行 用npm start 也可以，个人习惯 如果出现下面这个提示，说明3000端口被占用，找到这个运行的程序关掉就ok 然后重新运行 1yarn start 出现这个，我们的项目就顺利建成了 🙈🙈🙈~~]]></content>
+      <tags>
+        <tag>react</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[markdowm表情包]]></title>
+    <url>%2F2019%2F02%2F20%2Fmarkdowm%E8%A1%A8%E6%83%85%E5%8C%85%2F</url>
+    <content type="text"><![CDATA[markdown可以添加表情了😂 更多表情戳这里：https://www.webpagefx.com/tools/emoji-cheat-sheet/]]></content>
+      <tags>
+        <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[node创建一个服务]]></title>
+    <url>%2F2019%2F02%2F11%2Fnode%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%9C%8D%E5%8A%A1%2F</url>
+    <content type="text"><![CDATA[¶node创建一个服务 在创建服务之前，要先安装node以及npm包管理（现在的node都带有默认的npm包管理） 通过这个demo演示创建服务的过程 12345678910111213141516171819202122232425262728//http.js//引入http模块var http = require('http');//创建一个服务http.createServer(function(request, response)&#123; //request 请求体 //response 响应体 //writeHead 设置请求头 response.writeHead(200, &#123;'Content-Type': 'text/html; charset = utf-8'&#125;) //默认一般会有2次访问。即页面选项卡前的图标，一般建议过滤掉 if(request.url !== '/favicon.ico')&#123; //在控制台打印 console.log('hello'); //网页打印 response.write('hello world'); //控制台打印出请求体 console.log(request); //请求完成之后，要结束响应 response.end('你好，世界'); &#125;&#125;).listen(8000); //listen 监听本地8000端口//提示监听的端口号console.log('Server runningat http://127.0.0.1:8000');]]></content>
+      <tags>
+        <tag>node</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[加入购物车动画-基于fly.js插件]]></title>
+    <url>%2F2019%2F01%2F14%2F%E5%8A%A0%E5%85%A5%E8%B4%AD%E7%89%A9%E8%BD%A6%E5%8A%A8%E7%94%BB-%E5%9F%BA%E4%BA%8Efly-js%E6%8F%92%E4%BB%B6%2F</url>
+    <content type="text"><![CDATA[购物车飞入动画基于jquery的 fly.js插件,只需设置起点和终点的坐标即可，抛物线由fly.js来完成 资源下载地址：[https://github.com/amibug/fly]https://github.com/amibug/fly 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758&lt;!doctype html&gt;&lt;html lang="en"&gt;&lt;head&gt; &lt;meta charset="UTF-8"&gt; &lt;title&gt;飞入动画&lt;/title&gt; &lt;style&gt; .test&#123;background: red;width: 50px;height:50px;&#125; .box &#123; width: 100%; height: 1000px; background: #eee; &#125; &lt;/style&gt; &lt;/head&gt;&lt;body&gt;&lt;div class="box"&gt;飞入插件&lt;/div&gt;&lt;script src="jquery.js"&gt;&lt;/script&gt;&lt;script src="fly.min.js"&gt;&lt;/script&gt;&lt;script&gt; // 飞到的终点的坐标 var globalLeft = $('.box').offset().left; var globalTop = $('.box').offset().top - $(document).scrollTop() + 1000; //绑定点击事件 $('.box').on('click', fly); &lt;!-- 飞入执行 --&gt; function fly(event)&#123; console.log(10); var flyer = $('&lt;div class="test"&gt;&lt;/div&gt;'); flyer.fly(&#123; start: &#123; left: event.pageX, top: event.pageY-$(document).scrollTop() &#125;, end: &#123; top: globalTop, left: globalLeft, width: 0, height: 0, &#125;, onEnd: function()&#123; this.destroy(); &#125; &#125;) &#125;&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;]]></content>
+      <tags>
+        <tag>javascript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[jQuery.range双滑块范围选择]]></title>
+    <url>%2F2019%2F01%2F14%2FjQuery-range%E5%8F%8C%E6%BB%91%E5%9D%97%E8%8C%83%E5%9B%B4%E9%80%89%E6%8B%A9%2F</url>
+    <content type="text"><![CDATA[基于jquery的双滑块范围选择插件jquery.range.js 效果（颜色默认为绿色，这里我改了本地的css文件）： 1.首先载入jquery以及range插件相关文件： 123&lt;link rel="stylesheet" href="range.css"&gt;&lt;script src="jquery.js"&gt;&lt;/script&gt;&lt;script src="range.min.js"&gt;&lt;/script&gt; 2.然后在需要展示滑块的地方放入下面代码（这里设置默认范围值为 0,80 ）： 1&lt;input type="hidden" value="0, 80" id="range" class="slider-input"/&gt; 3.在js中写入下面部分： 12345678910111213141516 $('.slider-input').jRange(&#123; from: 0, //滑块范围的初始值 to: 80, //滑块范围的终止值 step: 1, //设置步长 scale: [0,20,40,60,80], //滑动条下方的尺度变标签 format: '%s', //数值格式 width: 300, //进度条的宽度 showLabels: true, //是否显示滑动条下方的尺寸标签 showScale: false, //是否显示滑块上方的数值标签 isRange: true, //是否为选取范围 onstatechange: function(e)&#123; //滑块范围改变时触发的方法 console.log(e); &#125; &#125;); $('.slider-input').jRange('setValue', '25, 50'); //滑块赋值 上面的设置在文档中也有详细的描述，基本都可以满足我们的需求 jquery.range文档参考：https://github.com/nitinhayaran/jRange.]]></content>
+      <tags>
+        <tag>javascript</tag>
+      </tags>
+  </entry>
+</search>
