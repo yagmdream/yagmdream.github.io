@@ -1952,7 +1952,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #6e3093;
+  background: #220a13;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -3141,4 +3141,7 @@ pre .javascript .function {
 .links-of-blogroll-item {
   float: left;
   width: 50%;
+}
+.posts-expand .post-body .fancybox img {
+  margin: 0 0 25px 0;
 }
