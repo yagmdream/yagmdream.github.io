@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="webpack,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="蔓羊" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="在之前的章节中，我们学到了有关于在配置环境中，如何区分开发环境与生产环境。但在源代码中还是不能区分开发环境与生产环境。事实上，我们经常会碰到开发环境中使用这个域名： http://test.api.com。正式环境中使用另一个域名：http://prod.api.com。所以，webpack提供了DefinePlugin插件。  DefinePlugin 允许创建一个在编译时可以配置的全局常量。这">
+<meta name="keywords" content="webpack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webpack-环境变量-16">
+<meta property="og:url" content="http://yoursite.com/2019/08/12/webpack-环境变量-16/index.html">
+<meta property="og:site_name" content="蔓羊">
+<meta property="og:description" content="在之前的章节中，我们学到了有关于在配置环境中，如何区分开发环境与生产环境。但在源代码中还是不能区分开发环境与生产环境。事实上，我们经常会碰到开发环境中使用这个域名： http://test.api.com。正式环境中使用另一个域名：http://prod.api.com。所以，webpack提供了DefinePlugin插件。  DefinePlugin 允许创建一个在编译时可以配置的全局常量。这">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/images/webpack/40.png">
+<meta property="og:image" content="http://yoursite.com/images/webpack/41.png">
+<meta property="og:image" content="http://yoursite.com/images/webpack/42.png">
+<meta property="og:updated_time" content="2019-08-15T04:41:13.803Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="webpack-环境变量-16">
+<meta name="twitter:description" content="在之前的章节中，我们学到了有关于在配置环境中，如何区分开发环境与生产环境。但在源代码中还是不能区分开发环境与生产环境。事实上，我们经常会碰到开发环境中使用这个域名： http://test.api.com。正式环境中使用另一个域名：http://prod.api.com。所以，webpack提供了DefinePlugin插件。  DefinePlugin 允许创建一个在编译时可以配置的全局常量。这">
+<meta name="twitter:image" content="http://yoursite.com/images/webpack/40.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/08/12/webpack-环境变量-16/">
+
+
+
+
+
+  <title>webpack-环境变量-16 | 蔓羊</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+	  <a href="https://github.com/yagmdream/yagmdream.github.io" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">蔓羊</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">梦想还是要有的，万一见鬼了呢</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-something">
+          <a href="/ something" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            其他
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/12/webpack-环境变量-16/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="yagmdream">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/user.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="蔓羊">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">webpack-环境变量-16</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-08-12T10:39:12+08:00">
+                2019-08-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/08/12/webpack-环境变量-16/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/08/12/webpack-环境变量-16/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/08/12/webpack-环境变量-16/" class="leancloud_visitors" data-flag-title="webpack-环境变量-16">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  1.9k 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  9 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在之前的章节中，我们学到了有关于在配置环境中，如何区分开发环境与生产环境。但在源代码中还是不能区分开发环境与生产环境。事实上，我们经常会碰到开发环境中使用这个域名： <code>http://test.api.com</code>。正式环境中使用另一个域名：<code>http://prod.api.com</code>。所以，<code>webpack</code>提供了<a href="https://webpack.docschina.org/plugins/define-plugin/" target="_blank" rel="noopener"><font color="#42A8E1">DefinePlugin<font></font></font></a>插件。</p>
+<blockquote>
+<p><code>DefinePlugin</code> 允许创建一个在编译时可以配置的全局常量。这可能会对开发模式和生产模式的构建允许不同的行为非常有用。如果在开发构建中，而不在发布构建中执行日志记录，则可以使用全局常量来决定是否记录日志。这就是 DefinePlugin 的用处，设置它，就可以忘记开发环境和生产环境构建的规则。</p>
+</blockquote>
+<h3 id="1-安装"><a class="header-anchor" href="#1-安装">¶</a>1.安装</h3>
+<p><code>DefinePlugin</code>是<code>webpack</code>的插件。所以我们需要安装<code>webpack</code>，如果前面安装过则无需安装。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install --save-dev webpack</span><br></pre></td></tr></table></figure>
+<h3 id="2-修改配置文件"><a class="header-anchor" href="#2-修改配置文件">¶</a>2.修改配置文件</h3>
+<p><strong>修改webpack.dev.js</strong></p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * 开发环境配置</span><br><span class="line"> * </span><br><span class="line">*/</span><br><span class="line">const path = require('path');</span><br><span class="line">const webpack = require('webpack');</span><br><span class="line"><span class="deletion">- const merge = require('webpack-merge'); </span></span><br><span class="line"><span class="deletion">- const commonConfig = require('./webpack.common.js');</span></span><br><span class="line"></span><br><span class="line">// 开发环境的配置</span><br><span class="line"> const devConfig = &#123;</span><br><span class="line">    mode: 'development',</span><br><span class="line">    devtool: 'cheap-module-eval-souce-map',</span><br><span class="line">    devServer: &#123;</span><br><span class="line">        contentBase: path.join(__dirname, 'dist'),</span><br><span class="line">        clientLogLevel: 'info',</span><br><span class="line">        open: true,</span><br><span class="line">        host: 'localhost',</span><br><span class="line">        port: '9090',</span><br><span class="line">        inline: true,</span><br><span class="line">        proxy: &#123;</span><br><span class="line">            '/': &#123;</span><br><span class="line">                target: 'http://yagmblog.com/',</span><br><span class="line">            &#125;,</span><br><span class="line">            '/upload': &#123;</span><br><span class="line">                target: 'http://yagmblog.com'</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        hot: true,</span><br><span class="line">        hotOnly: true,</span><br><span class="line">    &#125;,</span><br><span class="line">    module: &#123;</span><br><span class="line">        rules: [</span><br><span class="line">            &#123;</span><br><span class="line">                test: /\.css$/,</span><br><span class="line">                use: [</span><br><span class="line">                    "style-loader",</span><br><span class="line">                    "css-loader",</span><br><span class="line">                    'postcss-loader',</span><br><span class="line">                ],</span><br><span class="line">            &#125;,&#123;</span><br><span class="line">                test: /\.scss$/,</span><br><span class="line">                use: [</span><br><span class="line">                    'style-loader',</span><br><span class="line">                    &#123;</span><br><span class="line">                        loader: 'css-loader',</span><br><span class="line">                        options: &#123;</span><br><span class="line">                            importLoaders: 2,</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;,</span><br><span class="line">                    'sass-loader',</span><br><span class="line">                    'postcss-loader',</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">    </span><br><span class="line">    plugins: [</span><br><span class="line">        new webpack.HotModuleReplacementPlugin(),</span><br><span class="line">    ],</span><br><span class="line">    output:&#123;</span><br><span class="line">        filename: '[name].js',</span><br><span class="line">        chunkFilename: '[name].chunk.js',</span><br><span class="line">    &#125;, </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="deletion">- module.exports = merge(commonConfig, devConfig)  // 原来是在不同环境配置文件中导入公共的配置，在不同环境合并导出</span></span><br><span class="line"></span><br><span class="line"><span class="addition">+ module.exports =  devConfig;  // 现在将不同环境的配置导入到公共配置中，根据打包命令传过来的环境参数进行不同的合并导出</span></span><br></pre></td></tr></table></figure>
+<p><strong>修改webpack.prod.js</strong></p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 生产环境配置</span><br><span class="line">**/</span><br><span class="line"><span class="deletion">- const merge = require('webpack-merge');</span></span><br><span class="line"><span class="deletion">- const commonConfig = require('./webpack.common.js');</span></span><br><span class="line"></span><br><span class="line">// MiniCssExtractPlugin 代码分割插件，不支持热更新，在开发环境中使用影响开发效率，建议在生产环境中用</span><br><span class="line">// css 和 sass loader 使用 MiniCssExtractPlugin.loader </span><br><span class="line">const MiniCssExtractPlugin = require('mini-css-extract-plugin');</span><br><span class="line">// optimize-css-assets-webpack-plugin    css压缩插件</span><br><span class="line">const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const prodConfig = &#123;</span><br><span class="line">    mode: 'production',</span><br><span class="line">    devtool: 'cheap-module-souce-map',</span><br><span class="line">    module: &#123;</span><br><span class="line">        rules: [</span><br><span class="line">            &#123;</span><br><span class="line">                test: /\.css$/,</span><br><span class="line">                use: [</span><br><span class="line">                    MiniCssExtractPlugin.loader,</span><br><span class="line">                    "css-loader",</span><br><span class="line">                    'postcss-loader',</span><br><span class="line">                ],</span><br><span class="line">            &#125;,&#123;</span><br><span class="line">                test: /\.scss$/,</span><br><span class="line">                use: [</span><br><span class="line">                    MiniCssExtractPlugin.loader,</span><br><span class="line">                    &#123;</span><br><span class="line">                        loader: 'css-loader',</span><br><span class="line">                        options: &#123;</span><br><span class="line">                            importLoaders: 2,</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;,</span><br><span class="line">                    'sass-loader',</span><br><span class="line">                    'postcss-loader',</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">    &#125;,</span><br><span class="line">    optimization: &#123;</span><br><span class="line">        minimizer: [</span><br><span class="line">            new OptimizeCssAssetsPlugin(&#123;&#125;)</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">    plugins: [</span><br><span class="line">        new MiniCssExtractPlugin(&#123;</span><br><span class="line">            filename: '[name].css',</span><br><span class="line">            chunkFilename: '[name].chunk.css'</span><br><span class="line">        &#125;),</span><br><span class="line">    ],</span><br><span class="line">    output: &#123;</span><br><span class="line">        filename: '[name].[contenthash].js',</span><br><span class="line">        chunkFilename: '[name].[contenthash].js'</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="deletion">- module.exports = merge(commonConfig, prodConfig)  // 原来是在不同环境配置文件中导入公共的配置，在不同环境合并导出</span></span><br><span class="line"></span><br><span class="line"><span class="addition">+ module.exports =  prodConfig;</span></span><br></pre></td></tr></table></figure>
+<p><strong>package.json</strong></p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">"scripts": &#123;</span><br><span class="line">    "dev": "webpack --mode development --env development  --colors",</span><br><span class="line"><span class="addition">+    "dev-build": "webpack --colors --config ./build/webpack.common.js --env=development",  // 执行打包的入口文件则统一为`webpack.common.js`，下面同</span></span><br><span class="line"><span class="addition">+    "start": "webpack-dev-server --colors --config ./build/webpack.common.js",</span></span><br><span class="line"><span class="addition">+    "build": "webpack --colors --config ./build/webpack.common.js --env=production"   //这块原来是生产环境的打包命令。现在加上`env`参数，方便在webpack.common.js文件中区分执行哪个配置</span></span><br><span class="line">  &#125;,</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p><strong>在<code>webpack.common.js</code>的同级目录，新建<code>webpack.config.js</code>文件</strong><br>
+webpack.config.js</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="addition">+ /**</span></span><br><span class="line"><span class="addition">+  * process为node变量, argv为打包命令后面的所有参数，以数组形式排列。这里取env设置全局变量</span></span><br><span class="line"><span class="addition">+  */</span></span><br><span class="line"><span class="addition">+ </span></span><br><span class="line"><span class="addition">+ let regStr = /--env=/</span></span><br><span class="line"><span class="addition">+ let argv = process.argv;</span></span><br><span class="line"><span class="addition">+ let env = '';</span></span><br><span class="line"><span class="addition">+ argv.forEach(val =&gt; &#123;</span></span><br><span class="line"><span class="addition">+     if(regStr.test(val))&#123;</span></span><br><span class="line"><span class="addition">+         env = val.replace(/--env=(.+)/g,"$1");</span></span><br><span class="line"><span class="addition">+     &#125;</span></span><br><span class="line"><span class="addition">+ &#125;)</span></span><br><span class="line"><span class="addition">+ </span></span><br><span class="line"><span class="addition">+ let config = &#123;   // 新建config变量，并将打包命令的env参数赋值给config。 tip: 此时的config依然在项目源码中无法使用</span></span><br><span class="line"><span class="addition">+     NODE_ENV: env</span></span><br><span class="line"><span class="addition">+ &#125;</span></span><br><span class="line"><span class="addition">+ </span></span><br><span class="line"><span class="addition">+ module.exports = config</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 公共的配置文件</span><br><span class="line">**/</span><br><span class="line">const path = require('path');</span><br><span class="line">const HtmlWebpackPlugin = require('html-webpack-plugin');</span><br><span class="line">const &#123; CleanWebpackPlugin &#125; = require('clean-webpack-plugin');</span><br><span class="line">const webpack = require('webpack');</span><br><span class="line"><span class="addition">+ const config = require('./webpack.config.js');     // 引入config</span></span><br><span class="line"><span class="addition">+ const merge = require('webpack-merge');</span></span><br><span class="line"><span class="addition">+ const devConfig = require('./webpack.dev.js');</span></span><br><span class="line"><span class="addition">+ const prodConfig = require('./webpack.prod.js');</span></span><br><span class="line"></span><br><span class="line">const commonConfig = &#123;</span><br><span class="line">    entry: &#123;</span><br><span class="line">        main: './src/index.js',</span><br><span class="line">    &#125;,</span><br><span class="line">    module: &#123;</span><br><span class="line">        rules: [&#123;</span><br><span class="line">            test: /\.js$/, </span><br><span class="line">            exclude: /(node_modules|bower_components|lib)/,</span><br><span class="line">            loader: 'babel-loader'</span><br><span class="line">        &#125;,&#123;</span><br><span class="line">            test: /\.jpg$/,</span><br><span class="line">            use: [&#123;</span><br><span class="line">                    loader: 'url-loader',</span><br><span class="line">                    options: &#123;</span><br><span class="line">                        name: '[name].[ext]?[hash]',</span><br><span class="line">                        publicPath: './dist/img',</span><br><span class="line">                        outputPath: 'img',</span><br><span class="line">                        limit: 204800,</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">        &#125;,&#123;</span><br><span class="line">            test: /\.(eot|ttf|svg|woff|woff2)$/,</span><br><span class="line">            use: [&#123;</span><br><span class="line">                    loader: 'file-loader',</span><br><span class="line">                    options: &#123;</span><br><span class="line">                        name: '[name].[ext]',</span><br><span class="line">                        publicPath: './iconfont',</span><br><span class="line">                        outputPath: 'iconfont',</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;,</span><br><span class="line">    plugins: [</span><br><span class="line">        new HtmlWebpackPlugin(&#123;</span><br><span class="line">            title: 'mywebpack',</span><br><span class="line">            // filename: 'bundle.html',</span><br><span class="line">            template: './index.html',</span><br><span class="line">        &#125;),</span><br><span class="line">        new CleanWebpackPlugin(),</span><br><span class="line">        new webpack.ProvidePlugin(&#123;</span><br><span class="line">            $: 'jquery',</span><br><span class="line">        &#125;),</span><br><span class="line"><span class="addition">+        new webpack.DefinePlugin(&#123;    // 创建 peocess.env 全局常量，将webpack.config.js中的取到的环境变量赋值给peocess.env </span></span><br><span class="line"><span class="addition">+            'process_env': JSON.stringify(config)</span></span><br><span class="line"><span class="addition">+        &#125;)</span></span><br><span class="line">        </span><br><span class="line">    ],</span><br><span class="line">    optimization: &#123;</span><br><span class="line">        runtimeChunk: &#123;</span><br><span class="line">            name: 'runtime',</span><br><span class="line">        &#125;,</span><br><span class="line">        usedExports: true,</span><br><span class="line">        splitChunks: &#123;</span><br><span class="line">            chunks: 'all',</span><br><span class="line">            cacheGroups: &#123;</span><br><span class="line">                vendors: &#123;</span><br><span class="line">                    test: /[\\/]node_modules[\\/]/,</span><br><span class="line">                    priority: -10,</span><br><span class="line">                    name: 'vendors',</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;,</span><br><span class="line">    performance: false,</span><br><span class="line">    output: &#123;</span><br><span class="line">        // publicPath: '../',   </span><br><span class="line">        filename: '[name].js',</span><br><span class="line">        chunkFilename: '[name].chunk.js',</span><br><span class="line">        path: path.resolve(__dirname, '../dist')</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="deletion">- module.exports = commonConfig</span></span><br><span class="line"></span><br><span class="line"><span class="addition">+ module.exports = env =&gt; &#123;    // 这里的`env`则是`package.json`中的打包命令设置的env参数。这里可以通过函数参数的形式接收。</span></span><br><span class="line"><span class="addition">+     if(env &amp;&amp; env.production)&#123;  // 如果`env.production`存在。则使用生产环境配置文件。否则，使用开发环境配置文件</span></span><br><span class="line"><span class="addition">+         return  merge(commonConfig, prodConfig) </span></span><br><span class="line"><span class="addition">+     &#125;else &#123;</span></span><br><span class="line"><span class="addition">+         return  merge(commonConfig, devConfig)</span></span><br><span class="line"><span class="addition">+     &#125;</span></span><br><span class="line"><span class="addition">+ &#125;</span></span><br></pre></td></tr></table></figure>
+<p><strong>index.js</strong></p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">import _ from 'lodash';</span><br><span class="line">import $ from 'jquery'</span><br><span class="line"></span><br><span class="line"><span class="addition">+ let host;</span></span><br><span class="line"><span class="addition">+ </span></span><br><span class="line"><span class="addition">+ if(process_env.NODE_ENV == 'development')&#123;  // 配置开发环境接口域名</span></span><br><span class="line"><span class="addition">+     host = 'http://test.api.com';  </span></span><br><span class="line"><span class="addition">+     </span></span><br><span class="line"><span class="addition">+ &#125;else if(process_env.NODE_ENV == 'production')&#123;  // 配置生产环境接口域名</span></span><br><span class="line"><span class="addition">+     host = 'http://prod.api.com';</span></span><br><span class="line"><span class="addition">+ &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="addition">+ console.log('--------');</span></span><br><span class="line"><span class="addition">+ console.log(host);    // 控制台打印设置的环境变量</span></span><br><span class="line"><span class="addition">+ console.log('--------');</span></span><br><span class="line"></span><br><span class="line">const dom = $('&lt;div&gt;');</span><br><span class="line">dom.html(_.join(['蔓', '羊'], '-----'));</span><br><span class="line">$('body').append(dom);</span><br></pre></td></tr></table></figure>
+<p><strong>修改完成，运行生产环境打包命令： <code>npm run build</code></strong><br>
+<img src="/images/webpack/40.png" alt="Alt"><br>
+上面可以看到，控制台已经成功地打印出了 <code>http://prod.api.com</code>。</p>
+<p><strong>再重新运行开发环境打包命令： <code>npm run dev-build</code></strong><br>
+<img src="/images/webpack/41.png" alt="Alt"><br>
+上面可以看到，控制台已经成功地打印出了 <code>http://test.api.com</code>。现在就成功实现项目源码中不同环境做不同的操作</p>
+<h3 id="3-cross-env-运行跨平台设置和使用环境变量的脚本"><a class="header-anchor" href="#3-cross-env-运行跨平台设置和使用环境变量的脚本">¶</a>3. cross-env 运行跨平台设置和使用环境变量的脚本</h3>
+<blockquote>
+<p><code>cross-env</code>是用来解决<code>windows</code>和<code>Unix</code>不同命令设置环境变量的问题。<code>cross-env</code>可以方便我们使用单一的命令来设置环境变量。让我们能够以unix方式设置环境变量，然后在windows上也能兼容运行。</p>
+</blockquote>
+<p><strong>安装 cross-env</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install --save-dev cross-env</span><br></pre></td></tr></table></figure>
+<p><strong>修改 package.json</strong></p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">"scripts": &#123;</span><br><span class="line">    "dev": "webpack --mode development --env development  --colors",</span><br><span class="line"><span class="addition">+    "dev-build": "cross-env NODE_ENV=test webpack --colors --config ./build/webpack.common.js",</span></span><br><span class="line">    "start": "webpack-dev-server --colors --config ./build/webpack.common.js",</span><br><span class="line"><span class="addition">+    "build": "cross-env NODE_ENV=prod webpack --colors --config ./build/webpack.common.js"</span></span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+<p><strong>webpack.config.js</strong></p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * process为node变量, argv为打包命令后面的所有参数，以数组形式排列。这里取env设置全局变量</span><br><span class="line"> */</span><br><span class="line">let regStr = /--env=/</span><br><span class="line">let argv = process.argv;</span><br><span class="line">let env = '';</span><br><span class="line"></span><br><span class="line">argv.forEach(val =&gt; &#123;</span><br><span class="line">    if(regStr.test(val))&#123;</span><br><span class="line">        env = val.replace(/--env=(.+)/g,"$1");</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">let config = &#123;</span><br><span class="line">    NODE_ENV: env,</span><br><span class="line"><span class="addition">+    ENV: process.env.NODE_ENV,</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = config</span><br></pre></td></tr></table></figure>
+<p><strong>webpack.common.js</strong></p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">plugins: [</span><br><span class="line">        new HtmlWebpackPlugin(&#123;</span><br><span class="line">            title: 'mywebpack',</span><br><span class="line">            // filename: 'bundle.html',</span><br><span class="line">            template: './index.html',</span><br><span class="line">        &#125;),</span><br><span class="line">        new CleanWebpackPlugin(),</span><br><span class="line">        new webpack.ProvidePlugin(&#123;</span><br><span class="line">            $: 'jquery',</span><br><span class="line">        &#125;),</span><br><span class="line">        new webpack.DefinePlugin(&#123;</span><br><span class="line">            'process_env': JSON.stringify(config),</span><br><span class="line"><span class="addition">+            'process.env': JSON.stringify(config.ENV)</span></span><br><span class="line">        &#125;)</span><br><span class="line">        </span><br><span class="line">    ],</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">module.exports = env =&gt; &#123;</span><br><span class="line"><span class="addition">+   if(process.env.NODE_ENV == 'prod')&#123;</span></span><br><span class="line">        return  merge(commonConfig, prodConfig)</span><br><span class="line">    </span><br><span class="line">    &#125;else &#123;</span><br><span class="line">        return  merge(commonConfig, devConfig)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>index.js</strong></p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">import _ from 'lodash';</span><br><span class="line">import $ from 'jquery'</span><br><span class="line">let host;</span><br><span class="line"></span><br><span class="line">if(process_env.NODE_ENV == 'development')&#123;  // 配置开发环境接口域名</span><br><span class="line">    host = 'http://test.api.com';  </span><br><span class="line">    </span><br><span class="line">&#125;else if(process_env.NODE_ENV == 'production')&#123;  // 配置生产环境接口域名</span><br><span class="line">    host = 'http://prod.api.com';</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="addition">+  console.log('--------');</span></span><br><span class="line"><span class="addition">+  console.log(process.env);   // 源码中控制台打印环境变量</span></span><br><span class="line"><span class="addition">+  console.log('--------');</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const dom = $('&lt;div&gt;');</span><br><span class="line">dom.html(_.join(['蔓', '羊'], '-----'));</span><br><span class="line">$('body').append(dom);</span><br></pre></td></tr></table></figure>
+<p><strong>运行 <code>npm run build</code> 生产环境打包命令，打包完成浏览器打开控制台</strong><br>
+<img src="/images/webpack/42.png" alt="Alt"><br>
+可以看到环境变量<code>prod</code>已经在控制台打印出来了。但在具体项目中，我们还是会使用不同环境调用不同的配置文件打包。所以了解了如何配置环境变量，最后代码回滚到这篇文章最开始状态。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/storieos.jpg" alt="yagmdream wechat" style="width: 200px; max-width: 100%;">
+    <div>欢迎关注技术生活公众号，storieos期待与你一起成长~</div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>你的支持是我写作的最大动力！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="yagmdream WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.png" alt="yagmdream Alipay">
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/webpack/" rel="tag"># webpack</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/07/webpack-shimming-15/" rel="next" title="webpack-shimming-15">
+                <i class="fa fa-chevron-left"></i> webpack-shimming-15
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/15/webpack-library打包-17/" rel="prev" title="webpack-library打包-17">
+                webpack-library打包-17 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&id=1351784589&auto=1&height=66"></iframe>
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/user.jpg" alt="yagmdream">
+            
+              <p class="site-author-name" itemprop="name">yagmdream</p>
+              <p class="site-description motion-element" itemprop="description">蔓羊博客</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yagmdream" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://me.csdn.net/sinat_40257787" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-crosshairs"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:yagmdream@163.com" target="_blank" title="E-mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.jianshu.com/u/323f35bf575f" target="_blank" title="简书">
+                      
+                        <i class="fa fa-fw fa-heartbeat"></i>简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-安装"><span class="nav-number">1.</span> <span class="nav-text">¶1.安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-修改配置文件"><span class="nav-number">2.</span> <span class="nav-text">¶2.修改配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-cross-env-运行跨平台设置和使用环境变量的脚本"><span class="nav-number">3.</span> <span class="nav-text">¶3. cross-env 运行跨平台设置和使用环境变量的脚本</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yagmdream</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'R5P9iFKfHSC6JEbJS9u9KJsw-gzGzoHsz',
+        appKey: 'PqLWYAIjAXmtRCMyt1HiDJMv',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("R5P9iFKfHSC6JEbJS9u9KJsw-gzGzoHsz", "PqLWYAIjAXmtRCMyt1HiDJMv");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body>
+</html>
+<script type="text/javascript" src="/js/src/love.js"></script>
